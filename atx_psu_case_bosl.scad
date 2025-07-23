@@ -1,18 +1,71 @@
 include <BOSL2/std.scad>
+include <BOSL2/screws.scad>
 
+$fn = $preview ? 8 : 32;
 
-$fn=32;
+psu_width = 86;
+psu_height = 150;
+psu_wall_thickness = 2.5;
+psu_rounding = 2;
 
-cuboid([60,40,40], rounding=5, edges="Z", anchor=BOTTOM) {
-    attach(TOP, BOTTOM) prismoid([60,40],[20,20], h=50, rounding1=5, rounding2=10) {
-        attach(TOP) cylinder(d=20, h=30, center=false) {
-            attach(TOP) cylinder(d1=50, d2=30, h=12, center=false);
-        }
-        attach([FRONT, BACK, LEFT, RIGHT]) cylinder(d1=14, d2=5, h=20) {
-            attach(TOP, LEFT, overlap=5) prismoid([30,20], [20,20], h=10, shift=[-7,0]);
-        }
+psu_depth = 40+15;
+
+module psu_cover(depth = 40, inner_lip = 15, bolts_inset = 0.4) {
+  psu_cutout_width=psu_width - 2 * psu_wall_thickness;
+  psu_cutout_height=psu_height - 2 * psu_wall_thickness;
+
+  module bolts_pair() {
+    mirror_copy([1, 0, 0])
+      translate([psu_cutout_width / 2 + bolts_inset, depth - inner_lip / 2 +1.5, 0])
+        rotate([90, 0, 90])
+          screw_hole(spec="M3", head="socket", length=10, teardrop=true, atype="head", anchor="head_bot");
+  }
+
+  union() {
+    // Body
+    difference() {
+      // Outter shell
+      cuboid(
+        [
+          psu_width,
+          depth,
+          psu_height,
+        ], anchor=FRONT, rounding=psu_rounding
+      );
+      // cutout
+      back(psu_wall_thickness)
+        cuboid(
+          [
+            psu_cutout_width,
+            depth * 2,
+            psu_cutout_height,
+          ], anchor=FRONT
+        );
+      // bolts
+      translate([0, 0, psu_height / 3]) bolts_pair();
+      translate([0, 0, -psu_height / 3]) bolts_pair();
     }
+
+    // Lip
+    back(psu_wall_thickness)
+      difference() {
+        cuboid(
+          [
+            psu_cutout_width+.2,
+            depth - inner_lip,
+            psu_cutout_height+0.2,
+          ], anchor=FRONT
+        );
+        back(-1)
+          cuboid(
+            [
+              psu_cutout_width - psu_wall_thickness * 2,
+              depth,
+              psu_cutout_height - psu_wall_thickness * 2,
+            ], anchor=FRONT
+          );
+      }
+  }
 }
 
-
-// vim: expandtab tabstop=4 shiftwidth=4 softtabstop=4 nowrap
+psu_cover(psu_depth);
