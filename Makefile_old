@@ -1,0 +1,50 @@
+OPENSCAD=/Applications/OpenSCAD-2021.01.app/Contents/MacOS/OpenSCAD
+
+SRC_EXT=.scad
+VAR_EXT=.json
+OUT_EXT=.stl
+PRW_EXT=.png
+
+OUTDIR=build
+
+SRCS=$(wildcard *${SRC_EXT})
+VARIANTS=$(wildcard *${VAR_EXT})
+
+all: ${SRCS:%${SRC_EXT}=%_all}
+
+define md_template
+$(1:%${SRC_EXT}=%)_VARIANTS=$(shell jq '.parameterSets | keys[]' $(1:%${SRC_EXT}=%${VAR_EXT}))
+
+.PHONY: $(1:%${SRC_EXT}=%)
+
+$(1:%${SRC_EXT}=%)_all: $(1:%${SRC_EXT}=%) ${$(1:%${SRC_EXT}=%)_VARIANTS:%${VAR_EXT}=%}
+$(1:%${SRC_EXT}=%): $${OUTDIR}/$(1:%${SRC_EXT}=%)${OUT_EXT}
+${$(1:%${SRC_EXT}=%)_VARIANTS:%${VAR_EXT}=%}: $${$(1:%${SRC_EXT}=%)_VARIANTS:%${VAR_EXT}=$${OUTDIR}/%${OUT_EXT}}
+
+$${OUTDIR}/$(1:%${SRC_EXT}=%)${OUT_EXT}: ${1} $${OUTDIR}
+	echo ${OPENSCAD} -m make --render -o $$@ -o $${@:%${OUT_EXT}=%${PRW_EXT}} ${OPTIONS} $$<
+
+$${OUTDIR}/$(1:%${SRC_EXT}=%)_%${OUT_EXT}: $(1) $(1:%${SRC_EXT}=%)_%${VAR_EXT} | $${OUTDIR}
+	echo ${OPENSCAD} -m make -o $$@ -p $${@:$${OUTDIR}/%${OUT_EXT}=%${VAR_EXT}} ${OPTIONS} $$<
+
+
+endef
+
+$(foreach src,$(SRCS),$(info $(call md_template,$(src))))
+
+${OUTDIR}:
+	mkdir ${OUTDIR}
+
+clean:
+	rm -rf ${OUTDIR}
+
+.PHONY: all
+.PHONY: clean 
+
+
+# ${BUILD_DIR}/%.stl: %.scad
+# 	${OPENSCAD} -m make -o $@ ${OPTIONS} $<
+
+# ${BUILD_DIR}/%.png: %.scad
+# 	${OPENSCAD} -m make -o $@ ${OPTIONS} ${PREVIEW_OPTIONS} $<
+

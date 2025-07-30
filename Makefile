@@ -1,27 +1,34 @@
 OPENSCAD=/Applications/OpenSCAD-2021.01.app/Contents/MacOS/OpenSCAD
 
-all: build preview
+OUTDIR=build
+SRCS=atx_psu_case_dps3005.scad
 
-BUILD_DIR=output
+OPTIONS=--render
+BUILD_ARGS=-m make
 
-SRCS=atx_psu_case_bosl.scad atx_psu_case_dps3005.scad
+all: atx_psu_case_dps3005_all
 
-OPTIONS=
+atx_psu_case_dps3005_variants=$(shell  jq '.parameterSets | keys[]' atx_psu_case_dps3005.json)
 
-PREVIEW_OPTIONS=
+atx_psu_case_dps3005_all: atx_psu_case_dps3005 atx_psu_case_dps3005_3posts atx_psu_case_dps3005_4posts
+atx_psu_case_dps3005: ${OUTDIR}/atx_psu_case_dps3005.stl
+atx_psu_case_dps3005_3posts: ${OUTDIR}/atx_psu_case_dps3005_3posts.stl
+atx_psu_case_dps3005_4posts: ${OUTDIR}/atx_psu_case_dps3005_4posts.stl
 
-build: ${BUILD_DIR} $(SRCS:%.scad=${BUILD_DIR}/%.stl)
-preview: ${BUILD_DIR} $(SRCS:%.scad=${BUILD_DIR}/%.png)
+${OUTDIR}/atx_psu_case_dps3005.stl: atx_psu_case_dps3005.scad ${OUTDIR}
+	${OPENSCAD} ${OPTIONS} ${BUILD_ARGS} -o $@ -o ${@:.stl=.png} $<
 
-${BUILD_DIR}/%.stl: %.scad
-	${OPENSCAD} -m make -o $@ ${OPTIONS} $<
+${OUTDIR}/atx_psu_case_dps3005_%.stl: atx_psu_case_dps3005.scad ${OUTDIR}
+	${OPENSCAD} ${OPTIONS} ${BUILD_ARGS} \
+		-P ${@:${OUTDIR}/atx_psu_case_dps3005_%=%} -p ${<:%.scad=%.json} \
+		-o $@.stl -o $@.png $<
 
-${BUILD_DIR}/%.png: %.scad
-	${OPENSCAD} -m make -o $@ ${OPTIONS} ${PREVIEW_OPTIONS} $<
+${OUTDIR}:
+	mkdir ${OUTDIR}
 
-output:
-	mkdir output
-
-.PHONY: clean all
 clean:
-	rm -rf output
+	rm -rf ${OUTDIR}
+
+.PHONY: all
+.PHONY: clean 
+
