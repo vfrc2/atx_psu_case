@@ -1,9 +1,9 @@
 // === Parameters ===
 psu_width = 86;
 psu_height = 150;
-psu_front_depth = 40;
+psu_front_depth = 58;
 psu_front_cutout = 10;
-psu_back_depth = 3;
+psu_back_depth = 30;
 psu_back_padding = 5;
 
 psu_wall_thickness = 3;
@@ -25,7 +25,7 @@ post_padding = psu_height / 5;
 post_count = 2;
 
 // DC/DC
-dcdc_bold_d = 4 + tolerance;
+dcdc_bold_d = 4+tolerance;
 dcdc_stage = 9;
 dcdc_stage_height = 5;
 dcdc_width = 55.5 + 3;
@@ -61,44 +61,42 @@ module psu_panel(depth, cutout = 0) {
   h_2 = psu_height / 2;
   difference() {
     cutout_padding = (depth + cutout + psu_wall_thickness) / 2 - cutout;
-    total_depth = depth + psu_bolt_padding*1.5 + cutout + psu_wall_thickness;
     minkowski() {
       difference() {
-        translate([0, total_depth / 2, 0]) cube(
-            [
-              psu_width + w2 - chamfer_r * 2,
-              total_depth - chamfer_r * 2,
-              psu_height + w2 - chamfer_r * 2,
-            ], center=true
-          );
+        cube(
+          [
+            psu_width - chamfer_r * 2 + w2,
+            depth + cutout + psu_wall_thickness - chamfer_r*2,
+            psu_height - chamfer_r * 2 + w2,
+          ], center=true
+        );
         if (cutout > 0) {
-          translate([0, total_depth-cutout, 0]) psu_cutout(cutout);
+          translate([0, cutout_padding, 0]) psu_cutout(cutout + 3);
         }
       }
       sphere(r=chamfer_r);
     }
-    translate([0, psu_wall_thickness + total_depth - psu_bolt_padding * 2 - cutout,0]) 
-    translate([0, total_depth/2, 0]) {
+    translate([0, depth/2-cutout/2, 0]) {
       cube(
         [
           psu_width + t2,
-          total_depth,
+          cutout_padding,
           psu_height + t2,
         ], center=true
       );
     }
-    translate([0, psu_wall_thickness + total_depth/2, 0]) {
+    translate([0, psu_wall_thickness, 0]) {
       cube(
         [
           psu_width - w2,
-          total_depth,
+          depth + cutout + psu_wall_thickness + 1,
           psu_height - w2,
         ], center=true
       );
     }
 
-    translate([0, depth + psu_bolt_padding, psu_height / 2 - psu_bolt_counter]) psu_double_bolt();
-    translate([0, depth + psu_bolt_padding, -psu_height / 2 + psu_bolt_counter]) psu_double_bolt();
+    translate([0, depth/2 - cutout/2, psu_height / 2 - psu_bolt_counter]) psu_double_bolt();
+    translate([0, depth/2 - cutout/2, -psu_height / 2 + psu_bolt_counter]) psu_double_bolt();
   }
 }
 
@@ -114,47 +112,47 @@ difference() {
   union() {
     psu_panel(psu_front_depth, psu_front_cutout);
 
-    // // Standoffs
-    // translate([-dcdc_width / 2, -psu_front_depth / 2, -dcdc_height / 2])
-    //   rotate([90, 0, 180]) dcdc_post();
-    // translate([-dcdc_width / 2, -psu_front_depth / 2, dcdc_height / 2])
-    //   rotate([90, 0, 180]) dcdc_post();
-    // translate([+dcdc_width / 2, -psu_front_depth / 2, -dcdc_height / 2])
-    //   rotate([90, 0, 180]) dcdc_post();
-    // translate([+dcdc_width / 2, -psu_front_depth / 2, dcdc_height / 2])
-    //   rotate([90, 0, 180]) dcdc_post();
+    // Standoffs
+    translate([-dcdc_width / 2, -psu_front_depth / 2, -dcdc_height / 2])
+      rotate([90, 0, 180]) dcdc_post();
+    translate([-dcdc_width / 2, -psu_front_depth / 2, dcdc_height / 2])
+      rotate([90, 0, 180]) dcdc_post();
+    translate([+dcdc_width / 2, -psu_front_depth / 2, -dcdc_height / 2])
+      rotate([90, 0, 180]) dcdc_post();
+    translate([+dcdc_width / 2, -psu_front_depth / 2, dcdc_height / 2])
+      rotate([90, 0, 180]) dcdc_post();
   }
 
   // Ventilation cutout
-  // cutouts = 10;
-  // distance = (psu_height - psu_wall_thickness * 6) / cutouts;
-  // for (i = [0:1:cutouts - 1])
-  //   translate([0, 0, -psu_height / 2 + distance / 2 + psu_wall_thickness * 3 + distance * i]) rotate([45]) cube([psu_width * 2, psu_width / 4, 3], center=true);
+  cutouts = 10;
+  distance = (psu_height - psu_wall_thickness * 6) / cutouts;
+  for (i = [0:1:cutouts - 1])
+    translate([0, 0, -psu_height / 2 + distance / 2 + psu_wall_thickness * 3 + distance * i]) rotate([45]) cube([psu_width * 2, psu_width / 4, 3], center=true);
 
   // DPS3005 cut out
-  // translate(
-  //   [
-  //     0,
-  //     -psu_front_depth / 2, //psu_height - cutout_height - (psu_width - cutout_width) + psu_wall_thickness - tolerance,
-  //     psu_height / 2 - cutout_height / 2 - psu_wall_thickness,
-  //   ]
-  // )
-  //   rotate([90])
-  //     cube([cutout_width + tolerance, cutout_height + tolerance, psu_wall_thickness * 10], center=true);
+  translate(
+    [
+      0,
+      -psu_front_depth / 2, //psu_height - cutout_height - (psu_width - cutout_width) + psu_wall_thickness - tolerance,
+      psu_height / 2 - cutout_height / 2 - psu_wall_thickness,
+    ]
+  )
+    rotate([90])
+      cube([cutout_width + tolerance, cutout_height + tolerance, psu_wall_thickness * 10], center=true);
 
   // Banana posts
-  // post_distance = psu_width / post_count;
-  // for (i = [0:1:post_count - 1])
-  //   translate([-psu_width / 2, 0, 0])
-  //     translate(
-  //       [
-  //         post_distance / 2 + post_distance * i,
-  //         0,
-  //         -psu_height / 2 + post_padding,
-  //       ]
-  //     )
-  //       rotate([90])
-  //         cylinder(psu_wall_thickness * 10, d=post_d + tolerance);
+  post_distance = psu_width / post_count;
+  for (i = [0:1:post_count - 1])
+    translate([-psu_width/2,0,0]) 
+    translate(
+      [
+       post_distance/2+post_distance * i,
+        0,
+        -psu_height / 2 + post_padding,
+      ]
+    )
+      rotate([90])
+        cylinder(psu_wall_thickness * 20, d=post_d + tolerance);
 }
 
 // Back Panel
@@ -162,15 +160,23 @@ translate([0, 150, 0])
   rotate([0, 0, 180])
     difference() {
       psu_panel(psu_back_depth / 2, 0);
-      cube([psu_width - psu_back_padding, psu_back_depth * 10, psu_height - psu_back_padding], center=true);
+      cube([psu_width - psu_back_padding, psu_back_depth * 2, psu_height - psu_back_padding], center=true);
     }
+
+
 
 //// Utols
+// translate(
+//   [
+//     0,
+//     -psu_front_depth / 2 - psu_front_cutout / 2 - psu_wall_thickness / 2,
+//     0,
+//   ]
+// )
+//   cube([100, 45, 10])
 
-  cube([100, 45, 10])
-
-    *difference() {
-      cube([120, 60, psu_wall_thickness]);
-      translate([120 / 2 - cutout_width / 2, 60 / 2 - cutout_height / 2, -1])
-        cube([cutout_width + tolerance, cutout_height + tolerance, psu_wall_thickness * 2]);
-    }
+//     *difference() {
+//       cube([120, 60, psu_wall_thickness]);
+//       translate([120 / 2 - cutout_width / 2, 60 / 2 - cutout_height / 2, -1])
+//         cube([cutout_width + tolerance, cutout_height + tolerance, psu_wall_thickness * 2]);
+//     }

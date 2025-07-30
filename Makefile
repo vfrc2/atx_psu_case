@@ -2,18 +2,26 @@ OPENSCAD=/Applications/OpenSCAD-2021.01.app/Contents/MacOS/OpenSCAD
 
 all: build preview
 
-FILE_NAME=atx_psu_case_dps3005
+BUILD_DIR=output
+
+SRCS=atx_psu_case_bosl.scad atx_psu_case_dps3005.scad
 
 OPTIONS=
 
-build: output
-	${OPENSCAD} -m make -o output/${FILE_NAME}.stl ${OPTIONS} ${FILE_NAME}.scad
+PREVIEW_OPTIONS=
 
-preview: output
-	${OPENSCAD} -m make -o output/${FILE_NAME}.png ${OPTIONS} ${FILE_NAME}.scad
+build: ${BUILD_DIR} $(SRCS:%.scad=${BUILD_DIR}/%.stl)
+preview: ${BUILD_DIR} $(SRCS:%.scad=${BUILD_DIR}/%.png)
+
+${BUILD_DIR}/%.stl: %.scad
+	${OPENSCAD} -m make -o $@ ${OPTIONS} $<
+
+${BUILD_DIR}/%.png: %.scad
+	${OPENSCAD} -m make -o $@ ${OPTIONS} ${PREVIEW_OPTIONS} $<
 
 output:
 	mkdir output
 
+.PHONY: clean all
 clean:
-	rm -rf build
+	rm -rf output
