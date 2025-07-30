@@ -2,14 +2,14 @@
 
 # Build
 
-## Docker
+```shell
+make
+```
+
+
+## Docker build
 
 ```shell
-docker run \
-    -it \
-    --rm \
-    -v $(pwd):/openscad \
-    -u $(id -u ${USER}):$(id -g ${USER}) \
-    openscad/openscad:latest \
-    /bin/bash
+docker build -t ghcr.io/vfrc2/openscad_builder:latest .
+docker push ghcr.io/vfrc2/openscad_builder:latest
 ```

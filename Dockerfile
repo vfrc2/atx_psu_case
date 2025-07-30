@@ -1,4 +1,7 @@
 FROM alpine
+LABEL org.opencontainers.image.source=https://github.com/vfrc2/atx_psu_case
+LABEL org.opencontainers.image.description="Openscad Build container"
+LABEL org.opencontainers.image.licenses=MIT
 
 RUN apk add openscad 
 
