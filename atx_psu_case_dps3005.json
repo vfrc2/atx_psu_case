@@ -1,0 +1,47 @@
+{
+    "parameterSets": {
+        "4posts": {
+            "chamfer_r": "1",
+            "cutout_height": "39",
+            "cutout_width": "75.8",
+            "dcdc_stage": "9",
+            "dcdc_stage_height": "5",
+            "post_count": "4",
+            "post_d": "6",
+            "psu_back_depth": "30",
+            "psu_back_padding": "5",
+            "psu_bolt": "3",
+            "psu_bolt_counter": "5.5",
+            "psu_bolt_depth": "2",
+            "psu_bolt_padding": "10",
+            "psu_front_cutout": "10",
+            "psu_front_depth": "58",
+            "psu_height": "150",
+            "psu_wall_thickness": "3",
+            "psu_width": "86",
+            "tolerance": "0.2"
+        },
+        "3posts": {
+            "chamfer_r": "1",
+            "cutout_height": "39",
+            "cutout_width": "75.8",
+            "dcdc_stage": "9",
+            "dcdc_stage_height": "5",
+            "post_count": "3",
+            "post_d": "6",
+            "psu_back_depth": "30",
+            "psu_back_padding": "5",
+            "psu_bolt": "3",
+            "psu_bolt_counter": "5.5",
+            "psu_bolt_depth": "2",
+            "psu_bolt_padding": "10",
+            "psu_front_cutout": "10",
+            "psu_front_depth": "58",
+            "psu_height": "150",
+            "psu_wall_thickness": "3",
+            "psu_width": "86",
+            "tolerance": "0.2"
+        }
+    },
+    "fileFormatVersion": "1"
+}
