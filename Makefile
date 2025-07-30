@@ -30,7 +30,7 @@ $${OUTDIR}/$(1:%.scad=%).stl: $(1) $${OUTDIR}
 
 $${OUTDIR}/$(1:%.scad=%)_%.stl: $(1) $${OUTDIR}
 	$${OPENSCAD} $${OPTIONS} $${BUILD_ARGS} \
-		-P $${@:$${OUTDIR}/$(1:%.scad=%)_%=%} -p $${<:%.scad=%.json} \
+		-P $$* -p $${<:%.scad=%.json} \
 		-o $$@ \
 		-o $${@:.stl=.png} \
 		$$<
