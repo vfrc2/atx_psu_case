@@ -3,12 +3,16 @@ name: Makefile CI
 on:
   push:
     branches: [ "master" ]
+    tags:
+      - "v*.*.*"
   pull_request:
     branches: [ "master" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     container: 
       image: ghcr.io/vfrc2/openscad_builder:latest
       credentials:
@@ -22,8 +26,20 @@ jobs:
     - name: Build stl
       run: make
     
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v4
+    - name: PreRelease
+      uses: "marvinpinto/action-automatic-releases@latest"
+      if: github.ref_name == 'master'
       with:
-        name: models
-        path: build/
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: ${{ github.ref_name }}
+        prerelease: true
+        title: "Development Build"
+        files: build/
+      
+    - name: Release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      if: github.ref_type == 'tag'
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
+        files: build/
