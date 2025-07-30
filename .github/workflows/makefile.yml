@@ -8,10 +8,14 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    container: ghcr.io/vfrc2/openscad_builder:latest
-
+    container: 
+      image: ghcr.io/vfrc2/openscad_builder:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.github_token }}
+      volumes:
+         - ${{ github.workspace }}:/src
     steps:
     - uses: actions/checkout@v4
 

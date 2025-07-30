@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.licenses=MIT
 
 RUN apk add openscad 
 
-RUN apk add unzip curl xvfb-run jq
+RUN apk add unzip curl xvfb-run jq make
 
 WORKDIR /tmp
 
