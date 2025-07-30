@@ -1,4 +1,5 @@
 // === Parameters ===
+
 psu_width = 86;
 psu_height = 150;
 psu_front_depth = 58;
@@ -16,10 +17,12 @@ psu_bolt_padding = 10;
 tolerance = 0.2;
 
 // DPS3005 cutout size
+
 cutout_width = 75.8;
 cutout_height = 39;
 
 // Banana post
+
 post_d = 6;
 post_padding = psu_height / 5;
 post_count = 2;
